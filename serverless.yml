@@ -1,0 +1,30 @@
+plugins:
+  - serverless-offline
+  - serverless-webpack
+
+service: bolt-aws-prototype
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  timeout: 10 # optional, in seconds, default is 6
+  region: ap-northeast-1 # Tokyo Region
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+        - lambda:InvokeAsync
+      Resource: "*"
+  environment:
+    SERVERLESS_SERVICE: ${self:service}
+    SERVERLESS_STAGE: ${env:SERVERLESS_STAGE, 'dev'}
+    SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+    SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
+
+functions:
+  app:
+    handler: handler.main
+    events:
+      - http:
+          method: post
+          path: /slack/events
